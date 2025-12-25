@@ -4,6 +4,7 @@
  */
 package com.mycompany.managementfastfood.ui;
 
+import com.mycompany.managementfastfood.ui.panel.BillPanel;
 import com.mycompany.managementfastfood.ui.panel.CashierPanel;
 import com.mycompany.managementfastfood.ui.panel.EmployeePanel;
 import com.mycompany.managementfastfood.ui.panel.OverviewPanel;
@@ -32,11 +33,10 @@ public class dashboard extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
         showPanel(new OverviewPanel());
-        menuList = Arrays.asList(
-        OverViewContainer,
+        menuList = Arrays.asList(OverViewContainer,
         CashierContainer,
         productContainer,
-        EmployeeContainer,
+        BillContainer,
         SignOutContainer
     );
         for (JPanel menu : menuList) {
@@ -92,13 +92,15 @@ public class dashboard extends javax.swing.JFrame {
         }
     });
 
-    EmployeeContainer.addMouseListener(new MouseAdapter() {
+    BillContainer.addMouseListener(new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
-            setActiveMenu(EmployeeContainer);
-            showPanel(new EmployeePanel()); 
+            setActiveMenu(BillContainer);
+            showPanel(new BillPanel()); 
         }
     });
+    
+    
 
 
 
@@ -130,9 +132,9 @@ public class dashboard extends javax.swing.JFrame {
         productContainer = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        EmployeeContainer = new javax.swing.JPanel();
+        BillContainer = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
+        BillContainer1 = new javax.swing.JLabel();
         SignOutContainer = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
@@ -141,6 +143,9 @@ public class dashboard extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        EmployeeContainer1 = new javax.swing.JPanel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
         right = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -248,37 +253,37 @@ public class dashboard extends javax.swing.JFrame {
 
         left.add(productContainer, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 190, 220, -1));
 
-        EmployeeContainer.setBackground(new java.awt.Color(25, 26, 46));
-        EmployeeContainer.setForeground(new java.awt.Color(237, 128, 50));
+        BillContainer.setBackground(new java.awt.Color(25, 26, 46));
+        BillContainer.setForeground(new java.awt.Color(237, 128, 50));
 
-        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Nhan Vien.png"))); // NOI18N
+        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/thu ngan.png"))); // NOI18N
         jLabel11.setIconTextGap(15);
 
-        jLabel12.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel12.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel12.setText("Nhân viên");
+        BillContainer1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        BillContainer1.setForeground(new java.awt.Color(255, 255, 255));
+        BillContainer1.setText("Hóa đơn");
 
-        javax.swing.GroupLayout EmployeeContainerLayout = new javax.swing.GroupLayout(EmployeeContainer);
-        EmployeeContainer.setLayout(EmployeeContainerLayout);
-        EmployeeContainerLayout.setHorizontalGroup(
-            EmployeeContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(EmployeeContainerLayout.createSequentialGroup()
+        javax.swing.GroupLayout BillContainerLayout = new javax.swing.GroupLayout(BillContainer);
+        BillContainer.setLayout(BillContainerLayout);
+        BillContainerLayout.setHorizontalGroup(
+            BillContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(BillContainerLayout.createSequentialGroup()
                 .addGap(40, 40, 40)
                 .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel12)
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addComponent(BillContainer1)
+                .addContainerGap(74, Short.MAX_VALUE))
         );
-        EmployeeContainerLayout.setVerticalGroup(
-            EmployeeContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, EmployeeContainerLayout.createSequentialGroup()
+        BillContainerLayout.setVerticalGroup(
+            BillContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, BillContainerLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(EmployeeContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(BillContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)))
+                    .addComponent(BillContainer1, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)))
         );
 
-        left.add(EmployeeContainer, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 220, -1));
+        left.add(BillContainer, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 290, 220, -1));
 
         SignOutContainer.setBackground(new java.awt.Color(25, 26, 46));
         SignOutContainer.setForeground(new java.awt.Color(237, 128, 50));
@@ -363,6 +368,38 @@ public class dashboard extends javax.swing.JFrame {
 
         left.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 220, 80));
 
+        EmployeeContainer1.setBackground(new java.awt.Color(25, 26, 46));
+        EmployeeContainer1.setForeground(new java.awt.Color(237, 128, 50));
+
+        jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Nhan Vien.png"))); // NOI18N
+        jLabel13.setIconTextGap(15);
+
+        jLabel14.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel14.setText("Nhân viên");
+
+        javax.swing.GroupLayout EmployeeContainer1Layout = new javax.swing.GroupLayout(EmployeeContainer1);
+        EmployeeContainer1.setLayout(EmployeeContainer1Layout);
+        EmployeeContainer1Layout.setHorizontalGroup(
+            EmployeeContainer1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(EmployeeContainer1Layout.createSequentialGroup()
+                .addGap(40, 40, 40)
+                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel14)
+                .addContainerGap(60, Short.MAX_VALUE))
+        );
+        EmployeeContainer1Layout.setVerticalGroup(
+            EmployeeContainer1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, EmployeeContainer1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(EmployeeContainer1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)))
+        );
+
+        left.add(EmployeeContainer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 220, -1));
+
         right.setBackground(new java.awt.Color(255, 255, 255));
         right.setAlignmentX(0.0F);
         right.setAlignmentY(0.0F);
@@ -423,14 +460,17 @@ public class dashboard extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel BillContainer;
+    private javax.swing.JLabel BillContainer1;
     private javax.swing.JPanel CashierContainer;
-    private javax.swing.JPanel EmployeeContainer;
+    private javax.swing.JPanel EmployeeContainer1;
     private javax.swing.JPanel OverViewContainer;
     private javax.swing.JPanel SignOutContainer;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;

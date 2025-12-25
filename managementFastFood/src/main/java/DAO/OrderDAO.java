@@ -9,6 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import model.OrderDetail;
 import util.DBConnection;
 
 public class OrderDAO {
@@ -58,5 +61,28 @@ public class OrderDAO {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    public List<OrderDetail> getOrderDetails(int orderID) {
+        List<OrderDetail> list = new ArrayList<>();
+        String sql = "SELECT f.FoodName, od.Quantity, od.Price " +
+                     "FROM OrderDetails od " +
+                     "JOIN Foods f ON od.FoodID = f.FoodID " +
+                     "WHERE od.OrderID = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, orderID);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new OrderDetail(
+                    rs.getString("FoodName"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price")
+                ));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

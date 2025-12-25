@@ -3,19 +3,228 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package com.mycompany.managementfastfood.ui.panel;
-
+import DAO.StatisticalDAO;
+import ViewPanel.ProductTopSaleItem;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 /**
  *
  * @author Acer
  */
 public class OverviewPanel extends javax.swing.JPanel {
+    
+    private StatisticalDAO statDAO = new StatisticalDAO();
+    private DecimalFormat df = new DecimalFormat("#,### đ");
+    
+    private Color COLOR_ACTIVE = new Color(230, 230, 230); 
+    private Color COLOR_DEFAULT = new Color(255, 255, 255); 
 
-    /**
-     * Creates new form OverviewPanel1
-     */
     public OverviewPanel() {
         initComponents();
+        initCustomEvents();
+        
+        loadData("TODAY");
+        highlightTab(jPanel14); 
     }
+
+    private void initCustomEvents() {
+        addTabEvent(jPanel14, "TODAY");
+        addTabEvent(jPanel15, "WEEK");
+        addTabEvent(jPanel16, "MONTH");
+        addTabEvent(jPanel13, "ALL");
+    }
+
+    private void addTabEvent(JPanel panel, String type) {
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                resetTabColors();
+                highlightTab(panel);
+                loadData(type);
+            }
+        });
+    }
+
+    private void resetTabColors() {
+        jPanel13.setBackground(COLOR_DEFAULT);
+        jPanel14.setBackground(COLOR_DEFAULT);
+        jPanel15.setBackground(COLOR_DEFAULT);
+        jPanel16.setBackground(COLOR_DEFAULT);
+    }
+
+    private void highlightTab(JPanel panel) {
+        panel.setBackground(COLOR_ACTIVE);
+    }
+
+    private void loadData(String type) {
+        Date dateFrom = new Date();
+        Date dateTo = new Date();
+        Calendar cal = Calendar.getInstance();
+
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        dateTo = cal.getTime();
+
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+
+        Date prevFrom = new Date();
+        Date prevTo = new Date();
+        Calendar prevCal = (Calendar) cal.clone();
+        String compareText = "";
+
+        if (type.equals("TODAY")) {
+            dateFrom = cal.getTime();
+            
+            prevCal.add(Calendar.DAY_OF_YEAR, -1);
+            prevFrom = prevCal.getTime();
+            
+            Calendar prevCalEnd = (Calendar) prevCal.clone();
+            prevCalEnd.set(Calendar.HOUR_OF_DAY, 23);
+            prevCalEnd.set(Calendar.MINUTE, 59);
+            prevTo = prevCalEnd.getTime();
+            
+            compareText = "so với hôm qua";
+
+        } else if (type.equals("WEEK")) {
+            cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+            dateFrom = cal.getTime(); 
+            
+            prevCal.set(Calendar.DAY_OF_WEEK, prevCal.getFirstDayOfWeek());
+            prevCal.add(Calendar.WEEK_OF_YEAR, -1);
+            prevFrom = prevCal.getTime();
+            
+            prevCal.add(Calendar.DAY_OF_YEAR, 6); 
+            prevCal.set(Calendar.HOUR_OF_DAY, 23); 
+            prevTo = prevCal.getTime(); 
+            
+            compareText = "so với tuần trước";
+
+        } else if (type.equals("MONTH")) {
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+            dateFrom = cal.getTime(); 
+            
+            prevCal.set(Calendar.DAY_OF_MONTH, 1);
+            prevCal.add(Calendar.MONTH, -1);
+            prevFrom = prevCal.getTime(); 
+            
+            prevCal.set(Calendar.DAY_OF_MONTH, prevCal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            prevCal.set(Calendar.HOUR_OF_DAY, 23);
+            prevTo = prevCal.getTime();
+            
+            compareText = "so với tháng trước";
+
+        } else if (type.equals("ALL")) {
+            cal.set(Calendar.YEAR, 2000);
+            dateFrom = cal.getTime();
+            compareText = ""; // Không so sánh
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        jLabel21.setText(type.equals("TODAY") ? "Hôm nay, " + sdf.format(new Date()) : 
+                         sdf.format(dateFrom) + " - " + sdf.format(dateTo));
+
+        double currentRevenue = statDAO.getRevenue(dateFrom, dateTo);
+        int currentOrders = statDAO.getTotalOrders(dateFrom, dateTo);
+        double currentAvg = (currentOrders > 0) ? (currentRevenue / currentOrders) : 0;
+
+        double prevRevenue = 0;
+        double prevAvg = 0;
+        
+        if (!type.equals("ALL")) {
+            prevRevenue = statDAO.getRevenue(prevFrom, prevTo);
+            int prevOrders = statDAO.getTotalOrders(prevFrom, prevTo);
+            prevAvg = (prevOrders > 0) ? (prevRevenue / prevOrders) : 0;
+        }
+        totalPrice.setText(df.format(currentRevenue));
+        jLabel6.setText(String.valueOf(currentOrders));
+        toltalCustomer.setText(String.valueOf(currentOrders));
+        averageBill.setText(df.format(currentAvg));
+        updateGrowthLabel(percentTotalPrice, jLabel4, currentRevenue, prevRevenue, compareText);
+        updateGrowthLabel(percentAverageBill, jLabel20, currentAvg, prevAvg, compareText);
+        int countHere = statDAO.getOrderTypeCount(0, dateFrom, dateTo); 
+        int countTakeAway = statDAO.getOrderTypeCount(1, dateFrom, dateTo);
+        lbHere.setText(String.valueOf(countHere));
+        lbTakeAway.setText(String.valueOf(countTakeAway));
+
+        loadTopProducts(dateFrom, dateTo);
+
+    }
+    
+    private void updateGrowthLabel(JLabel lblPercent, JLabel lblDesc, double current, double previous, String compareText) {
+        if (compareText.isEmpty()) {
+            lblPercent.setText("---");
+            lblPercent.setForeground(Color.GRAY);
+            lblDesc.setText("");
+            return;
+        }
+
+        double percent = 0;
+        if (previous > 0) {
+            percent = ((current - previous) / previous) * 100;
+        } else if (current > 0) {
+            percent = 100; 
+        }
+
+        String text = String.format("%+.1f%%", percent);
+        lblPercent.setText(text);
+        lblDesc.setText(compareText);
+
+        if (percent >= 0) {
+            lblPercent.setForeground(new Color(23, 163, 75)); 
+        } else {
+            lblPercent.setForeground(Color.RED); 
+        }
+    }
+
+    private void loadTopProducts(Date from, Date to) {
+        TopProductsSell.removeAll();
+        TopProductsSell.setLayout(new javax.swing.BoxLayout(TopProductsSell, javax.swing.BoxLayout.Y_AXIS));
+        
+        JLabel title = new JLabel("Top 3 Bán Chạy");
+        title.setFont(new java.awt.Font("Dialog", 1, 18));
+        title.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        TopProductsSell.add(title);
+
+        List<Object[]> list = statDAO.getTopSellingProducts(from, to);
+        
+        if (list.isEmpty()) {
+            JLabel empty = new JLabel("Chưa có dữ liệu bán hàng");
+            empty.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            TopProductsSell.add(empty);
+        } else {
+            for (Object[] row : list) {
+                String name = (String) row[0];
+                String img = (String) row[1]; // Ảnh
+                int qty = (int) row[2];
+                double total = (double) row[3];
+                
+                ProductTopSaleItem item = new ProductTopSaleItem();
+                item.setProductData(name, img, qty, total);
+                
+                TopProductsSell.add(item);
+            }
+        }
+        
+        TopProductsSell.revalidate();
+        TopProductsSell.repaint();
+    }
+    
+   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -33,30 +242,31 @@ public class OverviewPanel extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
         totalPrice = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
-        percentPrice = new javax.swing.JLabel();
+        percentTotalPrice = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
+        toltalCustomer = new javax.swing.JLabel();
         ChartContainer = new javax.swing.JPanel();
         TopProductsSell = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         chartContainer = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
+        lbHere = new javax.swing.JLabel();
         jPanel11 = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
+        lbTakeAway = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
+        averageBill = new javax.swing.JLabel();
         jPanel12 = new javax.swing.JPanel();
-        jLabel19 = new javax.swing.JLabel();
+        percentAverageBill = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
@@ -114,9 +324,9 @@ public class OverviewPanel extends javax.swing.JPanel {
 
         jPanel7.setBackground(new java.awt.Color(240, 253, 244));
 
-        percentPrice.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        percentPrice.setForeground(new java.awt.Color(23, 163, 75));
-        percentPrice.setText("+12%");
+        percentTotalPrice.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        percentTotalPrice.setForeground(new java.awt.Color(23, 163, 75));
+        percentTotalPrice.setText("+12%");
 
         jLabel4.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         jLabel4.setText("so với hôm qua");
@@ -127,9 +337,9 @@ public class OverviewPanel extends javax.swing.JPanel {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
-                .addComponent(percentPrice)
+                .addComponent(percentTotalPrice)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
@@ -137,7 +347,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(percentPrice)
+                    .addComponent(percentTotalPrice)
                     .addComponent(jLabel4))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -208,9 +418,9 @@ public class OverviewPanel extends javax.swing.JPanel {
         jLabel9.setForeground(new java.awt.Color(101, 100, 125));
         jLabel9.setText("Số Khách");
 
-        jLabel8.setFont(new java.awt.Font("Dialog", 1, 35)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel8.setText("21");
+        toltalCustomer.setFont(new java.awt.Font("Dialog", 1, 35)); // NOI18N
+        toltalCustomer.setForeground(new java.awt.Color(0, 0, 0));
+        toltalCustomer.setText("21");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -220,7 +430,7 @@ public class OverviewPanel extends javax.swing.JPanel {
                 .addGap(16, 16, 16)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
-                .addComponent(jLabel8)
+                .addComponent(toltalCustomer)
                 .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
@@ -228,7 +438,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
+                    .addComponent(toltalCustomer)
                     .addComponent(jLabel9))
                 .addContainerGap(9, Short.MAX_VALUE))
         );
@@ -250,7 +460,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             .addGroup(TopProductsSellLayout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(153, Short.MAX_VALUE))
+                .addContainerGap(129, Short.MAX_VALUE))
         );
         TopProductsSellLayout.setVerticalGroup(
             TopProductsSellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -262,15 +472,25 @@ public class OverviewPanel extends javax.swing.JPanel {
 
         chartContainer.setBackground(new java.awt.Color(255, 255, 255));
 
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Screenshot 2025-12-26 051952.png"))); // NOI18N
+        jLabel1.setToolTipText("");
+
         javax.swing.GroupLayout chartContainerLayout = new javax.swing.GroupLayout(chartContainer);
         chartContainer.setLayout(chartContainerLayout);
         chartContainerLayout.setHorizontalGroup(
             chartContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 739, Short.MAX_VALUE)
+            .addGroup(chartContainerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         chartContainerLayout.setVerticalGroup(
             chartContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 430, Short.MAX_VALUE)
+            .addGroup(chartContainerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout ChartContainerLayout = new javax.swing.GroupLayout(ChartContainer);
@@ -303,9 +523,9 @@ public class OverviewPanel extends javax.swing.JPanel {
         jLabel12.setForeground(new java.awt.Color(101, 100, 125));
         jLabel12.setText("Tại quán");
 
-        jLabel13.setFont(new java.awt.Font("Dialog", 1, 35)); // NOI18N
-        jLabel13.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel13.setText("21");
+        lbHere.setFont(new java.awt.Font("Dialog", 1, 35)); // NOI18N
+        lbHere.setForeground(new java.awt.Color(0, 0, 0));
+        lbHere.setText("21");
 
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
         jPanel10.setLayout(jPanel10Layout);
@@ -315,7 +535,7 @@ public class OverviewPanel extends javax.swing.JPanel {
                 .addGap(15, 15, 15)
                 .addComponent(jLabel12)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
-                .addComponent(jLabel13)
+                .addComponent(lbHere)
                 .addContainerGap())
         );
         jPanel10Layout.setVerticalGroup(
@@ -323,7 +543,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             .addGroup(jPanel10Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
+                    .addComponent(lbHere)
                     .addComponent(jLabel12))
                 .addContainerGap(9, Short.MAX_VALUE))
         );
@@ -336,9 +556,9 @@ public class OverviewPanel extends javax.swing.JPanel {
         jLabel14.setForeground(new java.awt.Color(101, 100, 125));
         jLabel14.setText("Mang về");
 
-        jLabel15.setFont(new java.awt.Font("Dialog", 1, 35)); // NOI18N
-        jLabel15.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel15.setText("21");
+        lbTakeAway.setFont(new java.awt.Font("Dialog", 1, 35)); // NOI18N
+        lbTakeAway.setForeground(new java.awt.Color(0, 0, 0));
+        lbTakeAway.setText("21");
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
@@ -348,7 +568,7 @@ public class OverviewPanel extends javax.swing.JPanel {
                 .addGap(23, 23, 23)
                 .addComponent(jLabel14)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
-                .addComponent(jLabel15)
+                .addComponent(lbTakeAway)
                 .addContainerGap())
         );
         jPanel11Layout.setVerticalGroup(
@@ -356,7 +576,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel15)
+                    .addComponent(lbTakeAway)
                     .addComponent(jLabel14))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -367,17 +587,17 @@ public class OverviewPanel extends javax.swing.JPanel {
 
         jLabel5.setFont(new java.awt.Font("Dialog", 1, 20)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel5.setText("Tổng đơn hàng hôm nay");
+        jLabel5.setText("Trung bình Bill");
 
-        jLabel18.setFont(new java.awt.Font("Dialog", 1, 40)); // NOI18N
-        jLabel18.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel18.setText("12.450.000 đ");
+        averageBill.setFont(new java.awt.Font("Dialog", 1, 40)); // NOI18N
+        averageBill.setForeground(new java.awt.Color(0, 0, 0));
+        averageBill.setText("12.450.000 đ");
 
         jPanel12.setBackground(new java.awt.Color(254, 242, 242));
 
-        jLabel19.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jLabel19.setForeground(java.awt.Color.red);
-        jLabel19.setText("+12%");
+        percentAverageBill.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        percentAverageBill.setForeground(java.awt.Color.red);
+        percentAverageBill.setText("+12%");
 
         jLabel20.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         jLabel20.setText("so với hôm qua");
@@ -388,9 +608,9 @@ public class OverviewPanel extends javax.swing.JPanel {
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
-                .addComponent(jLabel19)
+                .addComponent(percentAverageBill)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel12Layout.setVerticalGroup(
@@ -398,7 +618,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel19)
+                    .addComponent(percentAverageBill)
                     .addComponent(jLabel20))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -410,7 +630,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel18)
+                    .addComponent(averageBill)
                     .addComponent(jLabel5)
                     .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(76, Short.MAX_VALUE))
@@ -421,7 +641,7 @@ public class OverviewPanel extends javax.swing.JPanel {
                 .addGap(15, 15, 15)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(averageBill, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(78, 78, 78))
@@ -439,7 +659,7 @@ public class OverviewPanel extends javax.swing.JPanel {
         jLabel16.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(0, 0, 0));
         jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel16.setText("Tổng các năm");
+        jLabel16.setText("Tổng năm");
 
         javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
         jPanel13.setLayout(jPanel13Layout);
@@ -544,17 +764,15 @@ public class OverviewPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel ChartContainer;
     private javax.swing.JPanel TopProductsSell;
+    private javax.swing.JLabel averageBill;
     private javax.swing.JPanel chartContainer;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
@@ -564,7 +782,6 @@ public class OverviewPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -581,7 +798,11 @@ public class OverviewPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JLabel percentPrice;
+    private javax.swing.JLabel lbHere;
+    private javax.swing.JLabel lbTakeAway;
+    private javax.swing.JLabel percentAverageBill;
+    private javax.swing.JLabel percentTotalPrice;
+    private javax.swing.JLabel toltalCustomer;
     private javax.swing.JLabel totalPrice;
     // End of variables declaration//GEN-END:variables
 }

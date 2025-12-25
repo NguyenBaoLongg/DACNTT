@@ -1,3 +1,4 @@
+com\mycompany\managementfastfood\ui\panel\BillPanel.class
 ViewPanel\OnNoteSavedListener.class
 com\mycompany\managementfastfood\ui\dashboard$2.class
 com\mycompany\managementfastfood\ui\panel\CashierPanel$5.class
@@ -14,6 +15,7 @@ ViewPanel\OnAddFoodListener.class
 com\mycompany\managementfastfood\ui\Loginform$1.class
 com\mycompany\managementfastfood\ui\panel\ProductPanel$3.class
 ViewPanel\OrderDetails$3.class
+ViewPanel\ProductTopSaleItem.class
 com\mycompany\managementfastfood\ui\panel\ProductPanel$6.class
 ViewPanel\OnEditFoodListener.class
 com\mycompany\managementfastfood\ManagementFastFood.class
@@ -21,6 +23,7 @@ ViewPanel\OrderDetails$4.class
 ViewPanel\orderItem$1$1.class
 com\mycompany\managementfastfood\ui\panel\CashierPanel.class
 com\mycompany\managementfastfood\ui\panel\EmployeePanel$4.class
+com\mycompany\managementfastfood\ui\panel\BillPanel$1.class
 com\mycompany\managementfastfood\ui\panel\CashierPanel$4.class
 model\Account.class
 com\mycompany\managementfastfood\ui\dashboard$3.class
@@ -36,6 +39,7 @@ ViewPanel\ProductItem.class
 com\mycompany\managementfastfood\ui\panel\ProductPanel$4.class
 com\mycompany\managementfastfood\ui\panel\SettingPanel.class
 DAO\FoodDAO.class
+DAO\StatisticalDAO.class
 ViewPanel\OrderDetails$2.class
 DAO\CategoryDAO.class
 ViewPanel\OrderDetails$5.class
@@ -54,6 +58,7 @@ com\mycompany\managementfastfood\ui\dashboard$1.class
 com\mycompany\managementfastfood\ui\dashboard.class
 com\mycompany\managementfastfood\ui\panel\CashierPanel$11.class
 util\DBConnection.class
+com\mycompany\managementfastfood\ui\panel\BillPanel$2.class
 ViewPanel\PersonItem.class
 ViewPanel\ProductItem$1.class
 DAO\AccountDAO.class
@@ -63,14 +68,18 @@ com\mycompany\managementfastfood\ui\dashboard$4.class
 model\OrderDetail.class
 ViewPanel\OrderDetails.class
 com\mycompany\managementfastfood\ui\panel\ProductPanel$2.class
+com\mycompany\managementfastfood\ui\panel\OverviewPanel$1.class
 com\mycompany\managementfastfood\ui\panel\CashierPanel$7.class
 ViewPanel\OnOrderListener.class
 com\mycompany\managementfastfood\ui\panel\OverviewPanel.class
 com\mycompany\managementfastfood\ui\panel\EmployeePanel$6.class
 ViewPanel\OrderDetails$1.class
+ViewPanel\BillItem.class
 com\mycompany\managementfastfood\ui\Loginform$3.class
 ViewPanel\ArrayList.class
 com\mycompany\managementfastfood\ui\dashboard$5.class
 com\mycompany\managementfastfood\ui\panel\CashierPanel$6.class
+model\Order.class
 com\mycompany\managementfastfood\ui\panel\ProductPanel$1.class
+DAO\BillDAO.class
 util\SharedData.class
