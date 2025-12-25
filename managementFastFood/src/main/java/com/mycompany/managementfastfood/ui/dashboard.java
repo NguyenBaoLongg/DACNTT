@@ -6,6 +6,7 @@ package com.mycompany.managementfastfood.ui;
 
 import com.mycompany.managementfastfood.ui.panel.CashierPanel;
 import com.mycompany.managementfastfood.ui.panel.OverviewPanel;
+import com.mycompany.managementfastfood.ui.panel.ProductPanel;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import java.awt.Color;
@@ -90,7 +91,7 @@ public class dashboard extends javax.swing.JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             setActiveMenu(productContainer);
-            showPanel(new JPanel()); // ProductPanel
+            showPanel(new ProductPanel()); // ProductPanel
         }
     });
 
@@ -361,6 +362,7 @@ public class dashboard extends javax.swing.JFrame {
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logo.png"))); // NOI18N
 
         jLabel3.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(204, 204, 204));
         jLabel3.setText("Quản lý chuyên nghiệp");
 
         jLabel4.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N

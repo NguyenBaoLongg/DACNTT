@@ -9,26 +9,48 @@ package model;
  * @author Acer
  */
 public class OrderDetail {
-    private int foodID;
-    private String name;
-    private double price;
+    // Thay vì lưu rời rạc, ta lưu luôn đối tượng Food
+    private Food food; 
     private int quantity;
-    private String note;
+    private String note; // Ghi chú (ví dụ: Không hành, ít đá...)
 
-    public OrderDetail(int foodID, String name, double price) {
-        this.foodID = foodID;
-        this.name = name;
-        this.price = price;
-        this.quantity = 1;
+    // Constructor nhận vào Food và số lượng ban đầu (thường là 1)
+    public OrderDetail(Food food, int quantity) {
+        this.food = food;
+        this.quantity = quantity;
         this.note = "";
     }
 
-    // getter và setter
-    public int getFoodID() { return foodID; }
-    public String getName() { return name; }
-    public double getPrice() { return price; }
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
-    public String getNote() { return note; }
-    public void setNote(String note) { this.note = note; }
+    // --- GETTERS & SETTERS ---
+
+    public Food getFood() {
+        return food;
+    }
+
+    public void setFood(Food food) {
+        this.food = food;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    // --- HÀM QUAN TRỌNG CẦN THÊM ---
+    
+    // Hàm tính tổng tiền của dòng này (Giá món x Số lượng)
+    public double getTotalPrice() {
+        return food.getPrice() * quantity;
+    }
 }

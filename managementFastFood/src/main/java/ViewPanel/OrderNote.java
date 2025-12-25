@@ -4,19 +4,134 @@
  */
 package ViewPanel;
 
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URL;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import model.OrderDetail;
+
 /**
  *
  * @author Acer
  */
-public class OrderNote extends javax.swing.JFrame {
+public class OrderNote extends JDialog{
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(OrderNote.class.getName());
+    private OrderDetail orderDetail;
+    private OnNoteSavedListener listener;
 
-    /**
-     * Creates new form OrderNote
-     */
+
+    public OrderNote(java.awt.Frame parent, OrderDetail orderDetail, OnNoteSavedListener listener) {
+        super(parent, true); // true = Modal (Chặn cửa sổ cha)
+        
+        initComponents();
+        this.orderDetail = orderDetail;
+        this.listener = listener;
+
+        setupWindow();
+        loadData();
+        addEvents();
+    }
+    
+    // Constructor phụ (không cần Parent Frame)
+    public OrderNote(OrderDetail orderDetail, OnNoteSavedListener listener) {
+        this.setModal(true); // Quan trọng
+        
+        initComponents();
+        this.orderDetail = orderDetail;
+        this.listener = listener;
+
+        setupWindow();
+        loadData();
+        addEvents();
+    }
+
+    // Constructor mặc định
     public OrderNote() {
         initComponents();
+    }
+
+    private void setupWindow() {
+        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        this.setTitle("Ghi chú món ăn");
+        this.pack(); 
+        this.setLocationRelativeTo(null); 
+    }
+
+    private void loadData() {
+        if (orderDetail != null) {
+            // 1. Tên món
+            if (orderDetail.getFood() != null) {
+                // --- SỬA TÊN BIẾN: jLabel13 ---
+                // Thay 'jLabel13' bằng tên cái Label hiển thị Tên món của bạn
+                jLabel13.setText(orderDetail.getFood().getFoodName());
+                
+                // 3. Load ảnh
+                loadImage(orderDetail.getFood().getImageURL());
+            }
+
+            // 2. Ghi chú cũ
+            String currentNote = orderDetail.getNote();
+            // --- SỬA TÊN BIẾN: note ---
+            // Thay 'note' bằng tên cái JTextArea (ô nhập liệu) của bạn
+            note.setText(currentNote == null ? "" : currentNote);
+        }
+    }
+    
+    private void loadImage(String linkImage) {
+        if (linkImage != null && !linkImage.isEmpty() && (linkImage.startsWith("http"))) {
+            try {
+                // --- SỬA TÊN BIẾN: jLabel12 ---
+                // Thay 'jLabel12' bằng tên cái Label hiển thị Ảnh của bạn
+                int w = jLabel12.getWidth() > 0 ? jLabel12.getWidth() : 100; // An toàn nếu width = 0
+                int h = jLabel12.getHeight() > 0 ? jLabel12.getHeight() : 70;
+
+                ImageIcon icon = new ImageIcon(new URL(linkImage));
+                Image img = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+                jLabel12.setIcon(new ImageIcon(img));
+            } catch (Exception e) {
+                // Bỏ qua lỗi ảnh
+            }
+        }
+    }
+
+    private void addEvents() {
+        // --- SỬA TÊN BIẾN: jPanel10 (Nút Lưu) ---
+        // Thay 'jPanel10' bằng tên cái Panel hoặc Button nút "Lưu" của bạn
+        jPanel10.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        jPanel10.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                confirmSave();
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                // Đổi màu khi di chuột vào (Bạn có thể đổi mã màu khác)
+                jPanel10.setBackground(new Color(0, 153, 51)); 
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                // Trả về màu gốc khi chuột đi ra (Màu này phải khớp màu thiết kế ban đầu)
+                jPanel10.setBackground(new Color(0, 204, 102)); 
+            }
+        });
+    }
+
+    private void confirmSave() {
+        // --- SỬA TÊN BIẾN: note ---
+        String content = note.getText().trim(); 
+
+        if (listener != null) {
+            listener.onSaveNote(content);
+        }
+        this.dispose();
     }
 
     /**
@@ -31,11 +146,12 @@ public class OrderNote extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
-        note = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
         jLabel18 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        note = new javax.swing.JTextArea();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(245, 245, 248));
 
@@ -46,9 +162,6 @@ public class OrderNote extends javax.swing.JFrame {
         jLabel13.setForeground(new java.awt.Color(0, 0, 0));
         jLabel13.setText("Burger bò");
         jLabel13.setToolTipText("");
-
-        note.setBackground(new java.awt.Color(255, 255, 255));
-        note.setToolTipText("");
 
         jPanel10.setBackground(new java.awt.Color(237, 128, 50));
 
@@ -71,6 +184,13 @@ public class OrderNote extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        note.setBackground(new java.awt.Color(255, 255, 255));
+        note.setColumns(20);
+        note.setLineWrap(true);
+        note.setRows(5);
+        note.setWrapStyleWord(true);
+        jScrollPane1.setViewportView(note);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -82,7 +202,7 @@ public class OrderNote extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(17, 17, 17)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(note)
+                    .addComponent(jScrollPane1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel12)
                         .addGap(18, 18, 18)
@@ -99,9 +219,9 @@ public class OrderNote extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(51, 51, 51)
                         .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(note, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(14, 14, 14)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(31, Short.MAX_VALUE))
         );
@@ -123,27 +243,7 @@ public class OrderNote extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new OrderNote().setVisible(true));
-    }
+   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel12;
@@ -151,6 +251,7 @@ public class OrderNote extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
-    private javax.swing.JTextField note;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea note;
     // End of variables declaration//GEN-END:variables
 }

@@ -14,21 +14,16 @@ import java.util.List;
  * @author Acer
  */
 public class FoodDAO {
-    public static List<Food> getAllAvailableFoods() {
 
+    // Lấy tất cả món ăn đang bán (Status = 1)
+    public List<Food> getAllFood() {
         List<Food> list = new ArrayList<>();
+        String sql = "SELECT * FROM Foods WHERE Status = 1";
 
-        String sql = """
-            SELECT FoodID, FoodName, CategoryID, Price, ImageURL, Status
-            FROM Foods
-            WHERE Status = 1
-        """;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-        try (
-            Connection conn = DBConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()
-        ) {
             while (rs.next()) {
                 Food food = new Food(
                     rs.getInt("FoodID"),

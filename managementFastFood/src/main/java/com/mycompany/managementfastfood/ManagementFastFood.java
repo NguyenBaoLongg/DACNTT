@@ -17,11 +17,11 @@ import javax.swing.JFrame;
 public class ManagementFastFood {
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
-        dashboard db = new dashboard();
-        db.setSize(1450, 770);       
-        db.setLocationRelativeTo(null); 
-        db.setResizable(false);       
-        db.setVisible(true);
+        Loginform lg = new Loginform();
+        lg.setSize(1450, 770);       
+        lg.setLocationRelativeTo(null); 
+        lg.setResizable(false);       
+        lg.setVisible(true);
     });
     }
 }

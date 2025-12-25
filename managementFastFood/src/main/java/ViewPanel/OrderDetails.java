@@ -10,20 +10,123 @@ import javax.swing.JPanel;
 import model.OrderDetail;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 /**
  *
  * @author Acer
  */
 public class OrderDetails extends javax.swing.JPanel {
 
-    /**
-     * Creates new form OrderDetails
-     */
+    private OrderDetail orderDetail; // Model chứa dữ liệu món ăn và số lượng
+    private OnOrderListener listener; // Để báo ra ngoài khi có thay đổi
+
+  
+    public OrderDetails(OrderDetail orderDetail, OnOrderListener listener) {
+        initComponents();
+        this.orderDetail = orderDetail;
+        this.listener = listener;
+        
+        loadData(); // Hiển thị dữ liệu lên giao diện
+        addEvents(); // Gán sự kiện cho các nút bấm
+    }
+
+  
     public OrderDetails() {
         initComponents();
-       
     }
     
+    
+    public OrderDetail getOrderDetail() {
+        return orderDetail;
+    }
+
+    public void updateQuantityUI() {
+        jTextField2.setText(String.valueOf(orderDetail.getQuantity()));
+    }
+    
+
+    private void loadData() {
+        if (orderDetail != null && orderDetail.getFood() != null) {
+            nameFood.setText(orderDetail.getFood().getFoodName());
+            priceFood.setText(String.format("%,.0f đ", orderDetail.getFood().getPrice()));
+            jTextField2.setText(String.valueOf(orderDetail.getQuantity()));
+            
+            updateNoteUI();
+        }
+    }
+
+    private void addEvents() {
+        noteFood.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+        OrderNote noteWindow = new OrderNote(orderDetail, new OnNoteSavedListener() {
+            @Override
+            public void onSaveNote(String noteContent) {
+                orderDetail.setNote(noteContent); 
+            }
+        });
+        
+        noteWindow.setVisible(true);
+    }
+});
+        // --- Nút Tăng (+) ---
+        btnIncreaseQuantity.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnIncreaseQuantity.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int qty = orderDetail.getQuantity() + 1;
+                orderDetail.setQuantity(qty);
+                updateQuantityUI();
+                listener.onUpdateOrder(); 
+            }
+        });
+
+        // --- Nút Giảm (-) ---
+        btnDecreaseQuantity.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnDecreaseQuantity.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (orderDetail.getQuantity() > 1) {
+                    int qty = orderDetail.getQuantity() - 1;
+                    orderDetail.setQuantity(qty);
+                    updateQuantityUI();
+                    listener.onUpdateOrder(); 
+                }
+            }
+        });
+
+        // --- Nút Xóa (Thùng rác) ---
+        btnDel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnDel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                
+                orderDetail.setQuantity(0);
+                
+                // Xóa giao diện dòng này khỏi màn hình
+                java.awt.Container parent = getParent();
+                if (parent != null) {
+                    parent.remove(OrderDetails.this);
+                    parent.revalidate();
+                    parent.repaint();
+                }
+                
+                listener.onUpdateOrder(); // Báo ra ngoài tính lại tiền
+            }
+        });
+    }
+    
+    public void updateNoteUI() {
+        String currentNote = orderDetail.getNote();
+        if (currentNote == null || currentNote.isEmpty()) {
+            noteFood.setText("Ghi chú..."); // Text mặc định nếu chưa có note
+            noteFood.setFont(new java.awt.Font("Dialog", 2, 12)); // In nghiêng
+        } else {
+            noteFood.setText(currentNote);
+            noteFood.setFont(new java.awt.Font("Dialog", 0, 14)); // Font thường
+        }
+    }
     
     
 
@@ -46,6 +149,10 @@ public class OrderDetails extends javax.swing.JPanel {
         btnDecreaseQuantity = new javax.swing.JLabel();
         noteFood = new javax.swing.JLabel();
         btnDel = new javax.swing.JLabel();
+
+        setMaximumSize(new java.awt.Dimension(374, 112));
+        setMinimumSize(new java.awt.Dimension(374, 112));
+        setName(""); // NOI18N
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -73,15 +180,11 @@ public class OrderDetails extends javax.swing.JPanel {
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-            .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(btnIncreaseQuantity, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE))
+            .addComponent(btnIncreaseQuantity, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 30, Short.MAX_VALUE)
-            .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(btnIncreaseQuantity, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
+            .addComponent(btnIncreaseQuantity)
         );
 
         jTextField2.setBackground(new java.awt.Color(255, 255, 255));
@@ -104,11 +207,15 @@ public class OrderDetails extends javax.swing.JPanel {
         jPanel15.setLayout(jPanel15Layout);
         jPanel15Layout.setHorizontalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnDecreaseQuantity, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+            .addGap(0, 30, Short.MAX_VALUE)
+            .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(btnDecreaseQuantity, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(btnDecreaseQuantity, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+            .addGap(0, 30, Short.MAX_VALUE)
+            .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(btnDecreaseQuantity, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE))
         );
 
         noteFood.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
@@ -129,7 +236,7 @@ public class OrderDetails extends javax.swing.JPanel {
                 .addGap(16, 16, 16)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                        .addComponent(jTextField2)
                         .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
@@ -141,30 +248,31 @@ public class OrderDetails extends javax.swing.JPanel {
                     .addComponent(noteFood, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDel, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(13, 13, 13))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(nameFood, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(priceFood))
-                    .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(26, 26, 26)
+                        .addComponent(btnDel, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(noteFood, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(nameFood, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(priceFood)
+                            .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel6Layout.createSequentialGroup()
+                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(noteFood, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addComponent(btnDel, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -177,7 +285,7 @@ public class OrderDetails extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 118, Short.MAX_VALUE)
+            .addGap(0, 112, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );

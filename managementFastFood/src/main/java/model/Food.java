@@ -26,6 +26,23 @@ public class Food {
         this.imageURL = imageURL;
         this.status = status;
     }
+    
+    public String getCategory() {
+        switch (this.categoryID) {
+            case 1:
+                return "Burger";
+            case 2:
+                return "Gà rán";
+            case 3:
+                return "Pizza";
+            case 4:
+                return "Món phụ";
+            case 5:
+                return "Đồ uống";
+            default:
+                return "Khác";
+        }
+    }
 
     public int getFoodID() { return foodID; }
     public String getFoodName() { return foodName; }

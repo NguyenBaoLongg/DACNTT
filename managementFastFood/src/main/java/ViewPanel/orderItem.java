@@ -4,7 +4,10 @@
  */
 package ViewPanel;
 
+import java.awt.Cursor;
 import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import model.Food;
 import javax.swing.ImageIcon;
 import java.net.URL;
@@ -13,9 +16,96 @@ import model.OrderDetail;
 
 public class orderItem extends javax.swing.JPanel {
 
-   
+   private Food food;
+    private OnOrderListener listener;
+
+
+    public orderItem(Food food, OnOrderListener listener) {
+        initComponents();
+        this.food = food;
+        this.listener = listener;
+        
+        loadData();  // Đổ dữ liệu (Tên, giá, ảnh)
+        addEvents(); // Gán sự kiện click
+    }
+
+    public orderItem() {
+        initComponents();
+    }
+
+    // --- HÀM XỬ LÝ LOGIC ---
+
+    private void loadData() {
+        if (food != null) {
+            // 1. Hiển thị Tên và Giá
+            FoodName.setText(food.getFoodName());
+            FoodPrice.setText(String.format("%,.0f đ", food.getPrice())); // Format ví dụ: 55,000 đ
+
+            // 2. Xử lý hiển thị Ảnh từ URL (Internet)
+            try {
+                String linkImage = food.getImageURL();
+                
+                // Kiểm tra xem link có hợp lệ không (có bắt đầu bằng http/https)
+                if (linkImage != null && (linkImage.startsWith("http") || linkImage.startsWith("https"))) {
+                    URL url = new URL(linkImage);
+                    ImageIcon icon = new ImageIcon(url);
+                    
+                    // Resize ảnh cho vừa với khung (Width: 140, Height: 90) để giao diện đẹp
+                    Image img = icon.getImage().getScaledInstance(140, 90, Image.SCALE_SMOOTH);
+                    ImageURL.setIcon(new ImageIcon(img));
+                } else {
+                    // Nếu không có ảnh hoặc link lỗi thì để trống hoặc set icon mặc định
+                    ImageURL.setText("No Image"); 
+                }
+            } catch (Exception e) {
+                System.err.println("Lỗi load ảnh món: " + food.getFoodName());
+                ImageURL.setIcon(null); // Set null nếu lỗi mạng
+            }
+        }
+    }
+
+    private void addEvents() {
+        MouseAdapter eventMoCuaSo = new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // [DEBUG] In ra dòng này để biết chuột đã ăn chưa
+                System.out.println("Đã click vào món: " + food.getFoodName());
+
+                try {
+                    // 1. Tạo OrderDetail giả
+                    OrderDetail tempDetail = new OrderDetail(food, 1);
+                    
+                    // 2. Mở cửa sổ Note
+                    OrderNote noteWindow = new OrderNote(tempDetail, new OnNoteSavedListener() {
+                        @Override
+                        public void onSaveNote(String noteContent) {
+                            if (listener != null) {
+                                // Gửi dữ liệu đi khi ấn Lưu
+                                listener.onAddFood(food, noteContent); 
+                            }
+                        }
+                    });
+                    
+                    noteWindow.setVisible(true);
+                    
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Lỗi mở cửa sổ: " + ex.getMessage());
+                }
+            }
+        };
+
+        // --- GẮN SỰ KIỆN CHO CẢ 2 THÀNH PHẦN ---
+        
+        // 1. Gắn cho dòng chữ
+        btnAddFood.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAddFood.addMouseListener(eventMoCuaSo);
+
+        // 2. Gắn cho cái hộp màu cam (QUAN TRỌNG)
+        jPanel10.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        jPanel10.addMouseListener(eventMoCuaSo);
     
-    
+    }
     
 
     /**
