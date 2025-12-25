@@ -21,7 +21,7 @@ import model.OrderDetail;
  */
 public class CashierPanel extends javax.swing.JPanel implements OnOrderListener {
 
-    private FoodDAO foodDAO = new FoodDAO(); // Khởi tạo DAO
+    private FoodDAO foodDAO = new FoodDAO(); 
     private int selectedOrderType = -1; // -1: Chưa chọn, 0: Tại chỗ, 1: Mang về
     private java.awt.Color CAT_ACTIVE_BG = new java.awt.Color(237, 128, 50);  
     private java.awt.Color CAT_ACTIVE_TEXT = java.awt.Color.WHITE;             
@@ -53,16 +53,32 @@ public class CashierPanel extends javax.swing.JPanel implements OnOrderListener 
     }
 
     private void initCustomLayout() {
-        // Cài đặt layout cho Panel CON nằm trong ScrollPane
         pnlFoodsChild.setLayout(new java.awt.GridLayout(0, 3, 10, 10)); 
         orderDetailContainerChild.setLayout(new BoxLayout(orderDetailContainerChild, BoxLayout.Y_AXIS));
+    }
+    public boolean insertOrderDetail(int orderID, int foodID, int quantity, double price, String note) {
+        String sql = "INSERT INTO OrderDetails (OrderID, FoodID, Quantity, Price, Note) VALUES (?, ?, ?, ?, ?)";
+        
+        // Dùng DBConnection của bạn
+        try (java.sql.Connection con = util.DBConnection.getConnection();
+             java.sql.PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setInt(1, orderID);
+            ps.setInt(2, foodID);
+            ps.setInt(3, quantity);
+            ps.setDouble(4, price);
+            ps.setString(5, note);
+            
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
  private void loadFoodData(String categoryName) {
     this.currentCategory = categoryName;
-
     String keyword = search.getText().trim();
-    
     if (keyword.equals("Tìm món...")) {
         keyword = "";
     }
@@ -71,6 +87,11 @@ public class CashierPanel extends javax.swing.JPanel implements OnOrderListener 
     pnlFoodsChild.removeAll(); 
 
     for (Food f : allFoods) {
+
+        if (f.getStatus() != 1) {
+            continue; 
+        }
+
         boolean isCategoryMatch = false;
         boolean isSearchMatch = false;
 
@@ -97,7 +118,7 @@ public class CashierPanel extends javax.swing.JPanel implements OnOrderListener 
             pnlFoodsChild.add(item);
         }
     }
-    
+
     pnlFoodsChild.revalidate();
     pnlFoodsChild.repaint();
 }
@@ -107,13 +128,16 @@ public class CashierPanel extends javax.swing.JPanel implements OnOrderListener 
         boolean isExist = false;
         
         for (java.awt.Component comp : orderDetailContainerChild.getComponents()) {
-            if (comp instanceof OrderDetails) {
-                OrderDetails detailUI = (OrderDetails) comp;
+            if (comp instanceof ViewPanel.OrderDetails) {
+                ViewPanel.OrderDetails detailUI = (ViewPanel.OrderDetails) comp;
                 if (detailUI.getOrderDetail().getFood().getFoodID() == food.getFoodID()) {
                     int currentQty = detailUI.getOrderDetail().getQuantity();
                     detailUI.getOrderDetail().setQuantity(currentQty + 1);
                     
-                    detailUI.updateQuantityUI();
+                    if (note != null && !note.isEmpty()) {
+                         detailUI.getOrderDetail().setNote(note);
+                    }
+                    detailUI.updateQuantityUI(); 
                     isExist = true;
                     break;
                 }
@@ -121,11 +145,11 @@ public class CashierPanel extends javax.swing.JPanel implements OnOrderListener 
         }
 
         if (!isExist) {
-            OrderDetail od = new OrderDetail(food, 1);
+            model.OrderDetail od = new model.OrderDetail(food, 1);
+            od.setNote(note); // Set the note
             
-            od.setNote(note); 
-            
-            OrderDetails newRow = new OrderDetails(od, this);
+            // Create the UI component for this order detail
+            ViewPanel.OrderDetails newRow = new ViewPanel.OrderDetails(od, this);
             orderDetailContainerChild.add(newRow); 
             orderDetailContainerChild.revalidate();
             orderDetailContainerChild.repaint();
@@ -182,14 +206,14 @@ public class CashierPanel extends javax.swing.JPanel implements OnOrderListener 
             btnHere.setForeground(TEXT_ACTIVE);
             
             he1.setBackground(COLOR_INACTIVE);
-            btnTakeAway1.setForeground(TEXT_INACTIVE); // Sửa tên biến thành btnTakeAway1
+            btnTakeAway1.setForeground(TEXT_INACTIVE);
         } else if (selectedOrderType == 1) {
             // Chọn Mang về
             he.setBackground(COLOR_INACTIVE);
             btnHere.setForeground(TEXT_INACTIVE);
             
             he1.setBackground(COLOR_ACTIVE);
-            btnTakeAway1.setForeground(TEXT_ACTIVE); // Sửa tên biến thành btnTakeAway1
+            btnTakeAway1.setForeground(TEXT_ACTIVE); 
         }
     }
     
@@ -220,25 +244,55 @@ public class CashierPanel extends javax.swing.JPanel implements OnOrderListener 
     }
 
     private void saveOrderToDB() {
+        // --- BƯỚC 1: LỌC DANH SÁCH MÓN ĂN TRONG GIỎ ---
         double totalAmount = 0;
+        java.util.List<ViewPanel.OrderDetails> listItems = new java.util.ArrayList<>();
+
         for (java.awt.Component comp : orderDetailContainerChild.getComponents()) {
-            if (comp instanceof OrderDetails) {
-                OrderDetails detailUI = (OrderDetails) comp;
+            if (comp instanceof ViewPanel.OrderDetails) {
+                ViewPanel.OrderDetails detailUI = (ViewPanel.OrderDetails) comp;
                 if (detailUI.getOrderDetail().getQuantity() > 0) {
                     totalAmount += detailUI.getOrderDetail().getTotalPrice();
+                    listItems.add(detailUI);
                 }
             }
         }
         
-        // Gọi DAO
+        if (listItems.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(null, "Giỏ hàng trống!");
+            return;
+        }
+
+        // --- BƯỚC 2: TẠO HÓA ĐƠN TỔNG (Lấy OrderID) ---
         DAO.OrderDAO orderDAO = new DAO.OrderDAO(); 
         int orderID = orderDAO.insertOrder(selectedOrderType, totalAmount);
         
         if (orderID > 0) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Thanh toán thành công! Mã đơn: #" + orderID);
-            resetUI(); 
+            int count = 0;
+            for (ViewPanel.OrderDetails item : listItems) {
+                model.OrderDetail od = item.getOrderDetail();
+                boolean success = orderDAO.insertOrderDetail(
+                    orderID, 
+                    od.getFood().getFoodID(), 
+                    od.getQuantity(), 
+                    od.getFood().getPrice(), 
+                    od.getNote()
+                );
+
+                if (success) {
+                    foodDAO.updateSoldQuantity(od.getFood().getFoodID(), od.getQuantity());
+                    count++;
+                }
+            }
+
+            if (count == listItems.size()) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Thanh toán thành công! Mã đơn: #" + orderID);
+                resetUI(); 
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(null, "Cảnh báo: Đã tạo đơn nhưng lỗi lưu chi tiết một số món.");
+            }
         } else {
-            javax.swing.JOptionPane.showMessageDialog(null, "Lỗi khi lưu hóa đơn!");
+            javax.swing.JOptionPane.showMessageDialog(null, "Lỗi: Không thể tạo hóa đơn!");
         }
     }
     
@@ -296,7 +350,6 @@ private void initCategoryEvents() {
         }
     });
 
-    // --- 2. SỰ KIỆN NÚT GÀ RÁN (Chicken) ---
     PnlChicken.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
     PnlChicken.addMouseListener(new java.awt.event.MouseAdapter() {
         @Override
@@ -305,11 +358,10 @@ private void initCategoryEvents() {
             PnlChicken.setBackground(CAT_ACTIVE_BG);
             lbChicken.setForeground(CAT_ACTIVE_TEXT);
             
-            loadFoodData("Gà rán"); // Tên phải khớp với trong Database
+            loadFoodData("Gà rán"); 
         }
     });
 
-    // --- 3. SỰ KIỆN NÚT BURGER ---
     PnlBurger.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
     PnlBurger.addMouseListener(new java.awt.event.MouseAdapter() {
         @Override
@@ -322,7 +374,6 @@ private void initCategoryEvents() {
         }
     });
 
-    // --- 4. SỰ KIỆN NÚT PIZZA ---
     PnlPizza.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
     PnlPizza.addMouseListener(new java.awt.event.MouseAdapter() {
         @Override
@@ -335,7 +386,6 @@ private void initCategoryEvents() {
         }
     });
 
-    // --- 5. SỰ KIỆN NÚT MÓN PHỤ (ExtraFood) ---
     java.awt.event.MouseAdapter extraEvent = new java.awt.event.MouseAdapter() {
         @Override
         public void mouseClicked(java.awt.event.MouseEvent e) {

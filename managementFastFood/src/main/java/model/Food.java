@@ -13,35 +13,24 @@ public class Food {
     private int foodID;
     private String foodName;
     private int categoryID;
+    private String categoryName; 
     private double price;
     private String imageURL;
     private int status;
+    private int soldQuantity; 
 
-    public Food(int foodID, String foodName, int categoryID,
-                double price, String imageURL, int status) {
+    public Food() {
+    }
+
+    public Food(int foodID, String foodName, int categoryID, String categoryName, double price, String imageURL, int status, int soldQuantity) {
         this.foodID = foodID;
         this.foodName = foodName;
         this.categoryID = categoryID;
+        this.categoryName = categoryName;
         this.price = price;
         this.imageURL = imageURL;
         this.status = status;
-    }
-    
-    public String getCategory() {
-        switch (this.categoryID) {
-            case 1:
-                return "Burger";
-            case 2:
-                return "Gà rán";
-            case 3:
-                return "Pizza";
-            case 4:
-                return "Món phụ";
-            case 5:
-                return "Đồ uống";
-            default:
-                return "Khác";
-        }
+        this.soldQuantity = soldQuantity;
     }
 
     public int getFoodID() { return foodID; }
@@ -50,4 +39,18 @@ public class Food {
     public double getPrice() { return price; }
     public String getImageURL() { return imageURL; }
     public int getStatus() { return status; }
+    public int getSoldQuantity() { return soldQuantity; }
+    
+    public String getCategory() {
+        return categoryName != null ? categoryName : "Unknown";
+    }
+
+    public void setFoodID(int foodID) { this.foodID = foodID; }
+    public void setFoodName(String foodName) { this.foodName = foodName; }
+    public void setCategoryID(int categoryID) { this.categoryID = categoryID; }
+    public void setCategory(String categoryName) { this.categoryName = categoryName; }
+    public void setPrice(double price) { this.price = price; }
+    public void setImageURL(String imageURL) { this.imageURL = imageURL; }
+    public void setStatus(int status) { this.status = status; }
+    public void setSoldQuantity(int soldQuantity) { this.soldQuantity = soldQuantity; }
 }

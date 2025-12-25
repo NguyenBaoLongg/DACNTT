@@ -31,9 +31,9 @@ public class OverviewPanel extends javax.swing.JPanel {
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        totalPrice = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        percentPrice = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
@@ -42,9 +42,9 @@ public class OverviewPanel extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         ChartContainer = new javax.swing.JPanel();
-        ChartRight = new javax.swing.JPanel();
-        jLabel11 = new javax.swing.JLabel();
         TopProductsSell = new javax.swing.JPanel();
+        jLabel11 = new javax.swing.JLabel();
+        chartContainer = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
@@ -108,15 +108,15 @@ public class OverviewPanel extends javax.swing.JPanel {
         jLabel3.setForeground(new java.awt.Color(102, 102, 102));
         jLabel3.setText("Doanh thu hôm nay");
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 40)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel2.setText("12.450.000 đ");
+        totalPrice.setFont(new java.awt.Font("Dialog", 1, 40)); // NOI18N
+        totalPrice.setForeground(new java.awt.Color(0, 0, 0));
+        totalPrice.setText("12.450.000 đ");
 
         jPanel7.setBackground(new java.awt.Color(240, 253, 244));
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(23, 163, 75));
-        jLabel1.setText("+12%");
+        percentPrice.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        percentPrice.setForeground(new java.awt.Color(23, 163, 75));
+        percentPrice.setText("+12%");
 
         jLabel4.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         jLabel4.setText("so với hôm qua");
@@ -127,7 +127,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
-                .addComponent(jLabel1)
+                .addComponent(percentPrice)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -137,7 +137,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
+                    .addComponent(percentPrice)
                     .addComponent(jLabel4))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -149,7 +149,7 @@ public class OverviewPanel extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
+                    .addComponent(totalPrice)
                     .addComponent(jLabel3)
                     .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(76, Short.MAX_VALUE))
@@ -160,7 +160,7 @@ public class OverviewPanel extends javax.swing.JPanel {
                 .addGap(15, 15, 15)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(totalPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(78, 78, 78))
@@ -237,39 +237,39 @@ public class OverviewPanel extends javax.swing.JPanel {
 
         ChartContainer.setBackground(new java.awt.Color(245, 245, 248));
 
-        ChartRight.setBackground(new java.awt.Color(255, 255, 255));
+        TopProductsSell.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel11.setFont(new java.awt.Font("Dialog", 1, 20)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(0, 0, 0));
         jLabel11.setText("Món bán chạy nhất");
 
-        javax.swing.GroupLayout ChartRightLayout = new javax.swing.GroupLayout(ChartRight);
-        ChartRight.setLayout(ChartRightLayout);
-        ChartRightLayout.setHorizontalGroup(
-            ChartRightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(ChartRightLayout.createSequentialGroup()
+        javax.swing.GroupLayout TopProductsSellLayout = new javax.swing.GroupLayout(TopProductsSell);
+        TopProductsSell.setLayout(TopProductsSellLayout);
+        TopProductsSellLayout.setHorizontalGroup(
+            TopProductsSellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(TopProductsSellLayout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(153, Short.MAX_VALUE))
         );
-        ChartRightLayout.setVerticalGroup(
-            ChartRightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(ChartRightLayout.createSequentialGroup()
+        TopProductsSellLayout.setVerticalGroup(
+            TopProductsSellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(TopProductsSellLayout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        TopProductsSell.setBackground(new java.awt.Color(255, 255, 255));
+        chartContainer.setBackground(new java.awt.Color(255, 255, 255));
 
-        javax.swing.GroupLayout TopProductsSellLayout = new javax.swing.GroupLayout(TopProductsSell);
-        TopProductsSell.setLayout(TopProductsSellLayout);
-        TopProductsSellLayout.setHorizontalGroup(
-            TopProductsSellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout chartContainerLayout = new javax.swing.GroupLayout(chartContainer);
+        chartContainer.setLayout(chartContainerLayout);
+        chartContainerLayout.setHorizontalGroup(
+            chartContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 739, Short.MAX_VALUE)
         );
-        TopProductsSellLayout.setVerticalGroup(
-            TopProductsSellLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        chartContainerLayout.setVerticalGroup(
+            chartContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 430, Short.MAX_VALUE)
         );
 
@@ -278,15 +278,15 @@ public class OverviewPanel extends javax.swing.JPanel {
         ChartContainerLayout.setHorizontalGroup(
             ChartContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ChartContainerLayout.createSequentialGroup()
-                .addComponent(TopProductsSell, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(chartContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(ChartRight, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(TopProductsSell, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         ChartContainerLayout.setVerticalGroup(
             ChartContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(ChartRight, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(TopProductsSell, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(chartContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jPanel1.add(ChartContainer, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 260, 1140, 430));
@@ -543,9 +543,8 @@ public class OverviewPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel ChartContainer;
-    private javax.swing.JPanel ChartRight;
     private javax.swing.JPanel TopProductsSell;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel chartContainer;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -556,7 +555,6 @@ public class OverviewPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
@@ -583,5 +581,7 @@ public class OverviewPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JLabel percentPrice;
+    private javax.swing.JLabel totalPrice;
     // End of variables declaration//GEN-END:variables
 }

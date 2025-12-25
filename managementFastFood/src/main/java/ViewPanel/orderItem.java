@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import model.Food;
 import javax.swing.ImageIcon;
 import java.net.URL;
@@ -37,29 +38,44 @@ public class orderItem extends javax.swing.JPanel {
 
     private void loadData() {
         if (food != null) {
-            // 1. Hiển thị Tên và Giá
             FoodName.setText(food.getFoodName());
-            FoodPrice.setText(String.format("%,.0f đ", food.getPrice())); // Format ví dụ: 55,000 đ
+            FoodPrice.setText(String.format("%,.0f đ", food.getPrice())); 
 
-            // 2. Xử lý hiển thị Ảnh từ URL (Internet)
             try {
-                String linkImage = food.getImageURL();
-                
-                // Kiểm tra xem link có hợp lệ không (có bắt đầu bằng http/https)
-                if (linkImage != null && (linkImage.startsWith("http") || linkImage.startsWith("https"))) {
-                    URL url = new URL(linkImage);
-                    ImageIcon icon = new ImageIcon(url);
-                    
-                    // Resize ảnh cho vừa với khung (Width: 140, Height: 90) để giao diện đẹp
+                String path = food.getImageURL();
+                ImageIcon icon = null;
+
+                if (path != null && !path.isEmpty()) {
+                    if (path.startsWith("http") || path.startsWith("https")) {
+                        icon = new ImageIcon(new URL(path));
+                    } 
+                    else {
+                        File f = new File(path);
+                        if (f.exists()) {
+                            icon = new ImageIcon(path);
+                        } else {
+                            java.net.URL imgUrl = getClass().getResource(path);
+                            if (imgUrl != null) {
+                                icon = new ImageIcon(imgUrl);
+                            }
+                        }
+                    }
+                }
+
+                if (icon != null) {
                     Image img = icon.getImage().getScaledInstance(140, 90, Image.SCALE_SMOOTH);
+                    ImageURL.setText(""); // Xóa chữ "No Image" nếu có
                     ImageURL.setIcon(new ImageIcon(img));
                 } else {
-                    // Nếu không có ảnh hoặc link lỗi thì để trống hoặc set icon mặc định
-                    ImageURL.setText("No Image"); 
+                    // Nếu không load được ảnh nào
+                    ImageURL.setText("No Image");
+                    ImageURL.setIcon(null);
                 }
+                
             } catch (Exception e) {
-                System.err.println("Lỗi load ảnh món: " + food.getFoodName());
-                ImageURL.setIcon(null); // Set null nếu lỗi mạng
+                System.err.println("Lỗi load ảnh: " + e.getMessage());
+                ImageURL.setText("Error");
+                ImageURL.setIcon(null);
             }
         }
     }

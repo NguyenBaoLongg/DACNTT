@@ -9,6 +9,7 @@ import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -20,120 +21,114 @@ import model.OrderDetail;
  * @author Acer
  */
 public class OrderNote extends JDialog{
-    
     private OrderDetail orderDetail;
     private OnNoteSavedListener listener;
-
-
     public OrderNote(java.awt.Frame parent, OrderDetail orderDetail, OnNoteSavedListener listener) {
-        super(parent, true); // true = Modal (Chặn cửa sổ cha)
-        
+        super(parent, true);
         initComponents();
         this.orderDetail = orderDetail;
         this.listener = listener;
-
         setupWindow();
         loadData();
         addEvents();
     }
-    
-    // Constructor phụ (không cần Parent Frame)
+
     public OrderNote(OrderDetail orderDetail, OnNoteSavedListener listener) {
-        this.setModal(true); // Quan trọng
-        
+        this.setModal(true);
         initComponents();
         this.orderDetail = orderDetail;
         this.listener = listener;
-
         setupWindow();
         loadData();
         addEvents();
     }
-
-    // Constructor mặc định
+  // Constructor mặc định
     public OrderNote() {
         initComponents();
     }
-
     private void setupWindow() {
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         this.setTitle("Ghi chú món ăn");
         this.pack(); 
         this.setLocationRelativeTo(null); 
     }
-
     private void loadData() {
         if (orderDetail != null) {
-            // 1. Tên món
             if (orderDetail.getFood() != null) {
-                // --- SỬA TÊN BIẾN: jLabel13 ---
-                // Thay 'jLabel13' bằng tên cái Label hiển thị Tên món của bạn
                 jLabel13.setText(orderDetail.getFood().getFoodName());
-                
-                // 3. Load ảnh
                 loadImage(orderDetail.getFood().getImageURL());
             }
-
-            // 2. Ghi chú cũ
             String currentNote = orderDetail.getNote();
-            // --- SỬA TÊN BIẾN: note ---
-            // Thay 'note' bằng tên cái JTextArea (ô nhập liệu) của bạn
             note.setText(currentNote == null ? "" : currentNote);
         }
     }
-    
-    private void loadImage(String linkImage) {
-        if (linkImage != null && !linkImage.isEmpty() && (linkImage.startsWith("http"))) {
-            try {
-                // --- SỬA TÊN BIẾN: jLabel12 ---
-                // Thay 'jLabel12' bằng tên cái Label hiển thị Ảnh của bạn
-                int w = jLabel12.getWidth() > 0 ? jLabel12.getWidth() : 100; // An toàn nếu width = 0
-                int h = jLabel12.getHeight() > 0 ? jLabel12.getHeight() : 70;
+ private void loadImage(String path) {
+        // (Đảm bảo jLabel12 là tên biến Label hiển thị Ảnh bên Design)
+        jLabel12.setIcon(null); 
+        jLabel12.setText("");
 
-                ImageIcon icon = new ImageIcon(new URL(linkImage));
-                Image img = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
-                jLabel12.setIcon(new ImageIcon(img));
+        if (path != null && !path.trim().isEmpty()) {
+            try {
+                ImageIcon icon = null;
+
+                // Cách 1: Link Online
+                if (path.startsWith("http") || path.startsWith("https")) {
+                    icon = new ImageIcon(new URL(path));
+                } 
+                // Cách 2: File Local
+                else {
+                    File f = new File(path);
+                    if (f.exists()) {
+                        icon = new ImageIcon(path);
+                    } else {
+                        // Thử tìm trong Resource project
+                        URL imgUrl = getClass().getResource(path);
+                        if(imgUrl != null) icon = new ImageIcon(imgUrl);
+                    }
+                }
+
+                // Hiển thị và Resize
+                if (icon != null) {
+                    // Lấy kích thước khung ảnh hiện tại (hoặc mặc định 100x70)
+                    int w = jLabel12.getWidth() > 0 ? jLabel12.getWidth() : 100;
+                    int h = jLabel12.getHeight() > 0 ? jLabel12.getHeight() : 70;
+
+                    Image img = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+                    jLabel12.setIcon(new ImageIcon(img));
+                } else {
+                    jLabel12.setText("No Image");
+                }
+
             } catch (Exception e) {
-                // Bỏ qua lỗi ảnh
+                e.printStackTrace();
+                jLabel12.setText("Lỗi ảnh");
             }
         }
     }
-
     private void addEvents() {
-        // --- SỬA TÊN BIẾN: jPanel10 (Nút Lưu) ---
-        // Thay 'jPanel10' bằng tên cái Panel hoặc Button nút "Lưu" của bạn
         jPanel10.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
         jPanel10.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 confirmSave();
             }
-
             @Override
             public void mouseEntered(MouseEvent e) {
-                // Đổi màu khi di chuột vào (Bạn có thể đổi mã màu khác)
                 jPanel10.setBackground(new Color(0, 153, 51)); 
             }
-
             @Override
             public void mouseExited(MouseEvent e) {
-                // Trả về màu gốc khi chuột đi ra (Màu này phải khớp màu thiết kế ban đầu)
                 jPanel10.setBackground(new Color(0, 204, 102)); 
             }
         });
     }
-
     private void confirmSave() {
-        // --- SỬA TÊN BIẾN: note ---
         String content = note.getText().trim(); 
-
         if (listener != null) {
             listener.onSaveNote(content);
         }
         this.dispose();
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

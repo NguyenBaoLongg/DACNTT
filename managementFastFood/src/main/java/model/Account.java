@@ -4,6 +4,8 @@
  */
 package model;
 
+import java.sql.Date;
+
 /**
  *
  * @author Acer
@@ -12,20 +14,27 @@ public class Account {
     private String userName;
     private String fullName;
     private String password;
+    private String phoneNumber;
+    private int gender; // 1: Nam, 0: Nữ
+    private Date birthDate;
     private int roleID;
+    private String roleName;
+    private int status;
 
-    // Constructor không tham số
     public Account() {
     }
 
     // Constructor đầy đủ
-    public Account(String userName, String fullName, String password, int roleID) {
+    public Account(String userName, String fullName, String phoneNumber, int gender, Date birthDate, int status, int roleID, String roleName) {
         this.userName = userName;
         this.fullName = fullName;
-        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.gender = gender;
+        this.birthDate = birthDate;
+        this.status = status; 
         this.roleID = roleID;
+        this.roleName = roleName;
     }
-
     // --- Getters & Setters ---
     public String getUserName() {
         return userName;
@@ -59,9 +68,29 @@ public class Account {
         this.roleID = roleID;
     }
     
-    // Hàm toString để in ra kiểm tra nếu cần
     @Override
     public String toString() {
         return "Account{" + "userName=" + userName + ", fullName=" + fullName + ", roleID=" + roleID + '}';
     }
+    public String getPhoneNumber() { return phoneNumber; }
+    public int getGender() { return gender; }
+    public String getRoleName() { return roleName; }
+    public int getStatus() { return status; }
+    public void setStatus(int status) { this.status = status; }
+
+    public Date getBirthDate() { 
+        return birthDate; 
+    }
+
+    public void setBirthDate(Date birthDate) { 
+        this.birthDate = birthDate; 
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber; 
+}
+
+    public void setGender(int gender) {
+    this.gender = gender;
+}
 }

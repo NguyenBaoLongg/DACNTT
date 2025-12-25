@@ -103,16 +103,28 @@ public class OrderDetails extends javax.swing.JPanel {
             public void mouseClicked(MouseEvent e) {
                 
                 orderDetail.setQuantity(0);
-                
-                // Xóa giao diện dòng này khỏi màn hình
                 java.awt.Container parent = getParent();
                 if (parent != null) {
                     parent.remove(OrderDetails.this);
                     parent.revalidate();
                     parent.repaint();
                 }
-                
-                listener.onUpdateOrder(); // Báo ra ngoài tính lại tiền
+                listener.onUpdateOrder();
+            }
+        });
+        
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                handleQuantityChange();
+                jPanel6.requestFocusInWindow(); 
+            }
+        });
+
+        jTextField2.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                handleQuantityChange();
             }
         });
     }
@@ -127,6 +139,28 @@ public class OrderDetails extends javax.swing.JPanel {
             noteFood.setFont(new java.awt.Font("Dialog", 0, 14)); // Font thường
         }
     }
+    private void handleQuantityChange() {
+        try {
+            String text = jTextField2.getText().trim();
+            
+            int newQty = Integer.parseInt(text);
+
+            if (newQty > 0) {
+                orderDetail.setQuantity(newQty);
+                
+                if (listener != null) {
+                    listener.onUpdateOrder(); 
+                }
+            } else {
+                updateQuantityUI();
+                javax.swing.JOptionPane.showMessageDialog(this, "Số lượng phải lớn hơn 0");
+            }
+        } catch (NumberFormatException e) {
+            updateQuantityUI();
+        }
+    }
+    
+    
     
     
 

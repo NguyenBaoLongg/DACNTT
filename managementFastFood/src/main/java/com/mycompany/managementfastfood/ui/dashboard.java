@@ -5,6 +5,7 @@
 package com.mycompany.managementfastfood.ui;
 
 import com.mycompany.managementfastfood.ui.panel.CashierPanel;
+import com.mycompany.managementfastfood.ui.panel.EmployeePanel;
 import com.mycompany.managementfastfood.ui.panel.OverviewPanel;
 import com.mycompany.managementfastfood.ui.panel.ProductPanel;
 import java.awt.BorderLayout;
@@ -27,9 +28,6 @@ public class dashboard extends javax.swing.JFrame {
     Color DEFAULT_COLOR = new Color(25, 26, 46);
     
     
-    /**
-     * Creates new form dashboard
-     */
     public dashboard() {
         initComponents();
         setLocationRelativeTo(null);
@@ -39,7 +37,6 @@ public class dashboard extends javax.swing.JFrame {
         CashierContainer,
         productContainer,
         EmployeeContainer,
-        SettingContainer,
         SignOutContainer
     );
         for (JPanel menu : menuList) {
@@ -48,7 +45,7 @@ public class dashboard extends javax.swing.JFrame {
         setActiveMenu(OverViewContainer);
     showPanel(new OverviewPanel());
 
-    initMenuEvents(); // gắn sự kiện click
+    initMenuEvents(); 
     }
     
     private void setActiveMenu(JPanel activeMenu) {
@@ -83,7 +80,7 @@ public class dashboard extends javax.swing.JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             setActiveMenu(CashierContainer);
-            showPanel(new CashierPanel()); // sau này thay CashierPanel
+            showPanel(new CashierPanel()); 
         }
     });
 
@@ -91,7 +88,7 @@ public class dashboard extends javax.swing.JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             setActiveMenu(productContainer);
-            showPanel(new ProductPanel()); // ProductPanel
+            showPanel(new ProductPanel()); 
         }
     });
 
@@ -99,17 +96,11 @@ public class dashboard extends javax.swing.JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             setActiveMenu(EmployeeContainer);
-            showPanel(new JPanel()); // EmployeePanel
+            showPanel(new EmployeePanel()); 
         }
     });
 
-    SettingContainer.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            setActiveMenu(SettingContainer);
-            showPanel(new JPanel()); // SettingPanel
-        }
-    });
+
 
     SignOutContainer.addMouseListener(new MouseAdapter() {
         @Override
@@ -142,9 +133,6 @@ public class dashboard extends javax.swing.JFrame {
         EmployeeContainer = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        SettingContainer = new javax.swing.JPanel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
         SignOutContainer = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
@@ -292,38 +280,6 @@ public class dashboard extends javax.swing.JFrame {
 
         left.add(EmployeeContainer, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 220, -1));
 
-        SettingContainer.setBackground(new java.awt.Color(25, 26, 46));
-        SettingContainer.setForeground(new java.awt.Color(237, 128, 50));
-
-        jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Cai dat.png"))); // NOI18N
-        jLabel13.setIconTextGap(15);
-
-        jLabel14.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel14.setText("Cài đặt");
-
-        javax.swing.GroupLayout SettingContainerLayout = new javax.swing.GroupLayout(SettingContainer);
-        SettingContainer.setLayout(SettingContainerLayout);
-        SettingContainerLayout.setHorizontalGroup(
-            SettingContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(SettingContainerLayout.createSequentialGroup()
-                .addGap(40, 40, 40)
-                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel14)
-                .addContainerGap(88, Short.MAX_VALUE))
-        );
-        SettingContainerLayout.setVerticalGroup(
-            SettingContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, SettingContainerLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(SettingContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)))
-        );
-
-        left.add(SettingContainer, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 290, 220, -1));
-
         SignOutContainer.setBackground(new java.awt.Color(25, 26, 46));
         SignOutContainer.setForeground(new java.awt.Color(237, 128, 50));
 
@@ -470,14 +426,11 @@ public class dashboard extends javax.swing.JFrame {
     private javax.swing.JPanel CashierContainer;
     private javax.swing.JPanel EmployeeContainer;
     private javax.swing.JPanel OverViewContainer;
-    private javax.swing.JPanel SettingContainer;
     private javax.swing.JPanel SignOutContainer;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;

@@ -11,57 +11,52 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import util.DBConnection;
 
-/**
- *
- * @author Acer
- */
 public class OrderDAO {
 
     public int insertOrder(int orderType, double totalAmount) {
         int orderId = -1;
-        
-        // Câu lệnh SQL
         String sql = "INSERT INTO Orders (OrderType, TotalAmount, Status, OrderDate) VALUES (?, ?, 1, NOW())";
-        
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
 
-        try {
-            con = DBConnection.getConnection();
-            
-            if (con == null) {
-                System.out.println("Không thể kết nối đến Database!");
-                return -1;
-            }
-            
-            ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            
-            ps.setInt(1, orderType);      // 0: Tại chỗ, 1: Mang về
-            ps.setDouble(2, totalAmount); 
-            
-            int affectedRows = ps.executeUpdate();
-            
-            if (affectedRows > 0) {
-                rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    orderId = rs.getInt(1);
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = (con != null) ? con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS) : null) {
+
+            if (con == null || ps == null) return -1;
+
+            ps.setInt(1, orderType);
+            ps.setDouble(2, totalAmount);
+
+            if (ps.executeUpdate() > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        orderId = rs.getInt(1); // Lấy ID hóa đơn vừa tạo
+                    }
                 }
             }
-            
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            // 5. Đóng resources
-            try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
-        
         return orderId;
+    }
+
+    // 2. TẠO CHI TIẾT HÓA ĐƠN (Hàm mới cần thêm)
+    public boolean insertOrderDetail(int orderID, int foodID, int quantity, double price, String note) {
+        String sql = "INSERT INTO OrderDetails (OrderID, FoodID, Quantity, Price, Note) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = (con != null) ? con.prepareStatement(sql) : null) {
+
+            if (con == null || ps == null) return false;
+
+            ps.setInt(1, orderID);
+            ps.setInt(2, foodID);
+            ps.setInt(3, quantity);
+            ps.setDouble(4, price);
+            ps.setString(5, note);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

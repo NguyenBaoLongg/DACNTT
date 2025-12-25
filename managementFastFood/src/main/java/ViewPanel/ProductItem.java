@@ -4,17 +4,91 @@
  */
 package ViewPanel;
 
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.ImageIcon;
+import model.Food;
+
 /**
  *
  * @author Acer
  */
 public class ProductItem extends javax.swing.JPanel {
 
-    /**
-     * Creates new form ProductItem
-     */
+    private Food food;
+    private OnEditFoodListener listener;
+
     public ProductItem() {
         initComponents();
+    }
+
+    public ProductItem(Food food, OnEditFoodListener listener) {
+        initComponents();
+        this.food = food;
+        this.listener = listener;
+        loadData();
+        addEvents();
+    }
+
+    private void loadData() {
+        if (food == null) return;
+
+        FoodName.setText(food.getFoodName());
+        FoodPrice.setText(String.format("%,.0f đ", food.getPrice()));
+
+        if (food.getStatus() == 1) {
+            jLabel2.setText("Đang bán");
+            jPanel8.setBackground(new Color(33, 181, 88));
+        } else {
+            jLabel2.setText("Ngừng bán");
+            jPanel8.setBackground(new Color(200, 50, 50));
+        }
+
+        try {
+            String path = food.getImageURL(); 
+            ImageIcon icon = null;
+
+            if (path != null && !path.isEmpty()) {
+                if (path.startsWith("http")) {
+                    icon = new ImageIcon(new java.net.URL(path));
+                } 
+                else if (path.startsWith("/")) {
+                    java.net.URL imgUrl = getClass().getResource(path);
+                    if (imgUrl != null) {
+                        icon = new ImageIcon(imgUrl);
+                    }
+                }
+                else {
+                    icon = new ImageIcon(path);
+                }
+            }
+
+            if (icon != null && icon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+                Image img = icon.getImage().getScaledInstance(190, 150, Image.SCALE_SMOOTH);
+                ImageURL.setIcon(new ImageIcon(img));
+            } else {
+                ImageURL.setText("No Image");
+                ImageURL.setIcon(null);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            ImageURL.setText("Error");
+        }
+    }
+
+    private void addEvents() {
+        btnFixFood1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnFixFood1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (listener != null) {
+                    listener.onEditFood(food);
+                }
+            }
+        });
     }
 
     /**
@@ -36,8 +110,16 @@ public class ProductItem extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         ImageURL = new javax.swing.JLabel();
 
+        setMaximumSize(new java.awt.Dimension(158, 203));
+        setMinimumSize(new java.awt.Dimension(158, 203));
+        setName(""); // NOI18N
+
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
         jPanel6.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel6.setMaximumSize(new java.awt.Dimension(158, 203));
+        jPanel6.setMinimumSize(new java.awt.Dimension(158, 203));
+        jPanel6.setName(""); // NOI18N
+        jPanel6.setPreferredSize(new java.awt.Dimension(158, 203));
 
         FoodName.setBackground(new java.awt.Color(255, 255, 255));
         FoodName.setFont(new java.awt.Font("Dialog", 1, 16)); // NOI18N
@@ -52,6 +134,8 @@ public class ProductItem extends javax.swing.JPanel {
         FoodPrice.setToolTipText("");
 
         jPanel12.setBackground(new java.awt.Color(245, 245, 248));
+        jPanel12.setMaximumSize(new java.awt.Dimension(127, 33));
+        jPanel12.setMinimumSize(new java.awt.Dimension(127, 33));
 
         btnFixFood1.setFont(new java.awt.Font("Dialog", 1, 16)); // NOI18N
         btnFixFood1.setForeground(new java.awt.Color(237, 128, 50));
@@ -62,24 +146,15 @@ public class ProductItem extends javax.swing.JPanel {
         jPanel12.setLayout(jPanel12Layout);
         jPanel12Layout.setHorizontalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 225, Short.MAX_VALUE)
-            .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel12Layout.createSequentialGroup()
-                    .addGap(4, 4, 4)
-                    .addComponent(btnFixFood1, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addComponent(btnFixFood1, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 33, Short.MAX_VALUE)
-            .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel12Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(btnFixFood1)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addComponent(btnFixFood1, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
         );
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setMaximumSize(new java.awt.Dimension(160, 90));
         jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel8.setBackground(new java.awt.Color(33, 181, 88));
@@ -94,72 +169,63 @@ public class ProductItem extends javax.swing.JPanel {
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+            .addGap(0, 70, Short.MAX_VALUE)
+            .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+            .addGap(0, 30, Short.MAX_VALUE)
+            .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
         );
 
-        jPanel4.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 0, 80, 30));
+        jPanel4.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 0, 70, 30));
 
         ImageURL.setForeground(new java.awt.Color(255, 255, 255));
         ImageURL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         ImageURL.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Burger-Shrimp.png"))); // NOI18N
-        jPanel4.add(ImageURL, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, 190, -1));
+        jPanel4.add(ImageURL, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, 160, 120));
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(12, 12, 12)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(FoodName, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(FoodPrice)
                     .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(FoodName, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(FoodPrice)))
-                    .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addContainerGap()
+                        .addGap(6, 6, 6)
                         .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
+            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(FoodName, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(FoodPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 253, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 240, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
